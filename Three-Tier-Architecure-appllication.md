@@ -151,4 +151,73 @@ Source: Bastion SG
 
 ```
 
+# ⚖️ Load Balancer Configuration
+Public ALB
 
+Configuration:
+```bash
+
+Type:
+Application Load Balancer
+
+Scheme:
+Internet-facing
+Listener:
+
+HTTP: 80
+
+Target Group:
+
+web-tg
+
+
+Protocol:
+
+HTTP
+
+
+Port:
+
+80
+
+Health Check:
+
+Path: /
+
+Matcher:
+
+200
+
+Internal ALB
+
+Configuration:
+```bash
+Scheme:
+
+Internal
+
+Listener:
+
+HTTP 80
+
+Target Group:
+
+app-tg
+
+Protocol:
+
+HTTP
+
+Port:
+
+8080
+
+Health Check:
+
+Path:
+
+/
+
+Matcher:
+200
+```
