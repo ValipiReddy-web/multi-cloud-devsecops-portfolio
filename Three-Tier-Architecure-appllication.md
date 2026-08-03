@@ -7,7 +7,10 @@ Web Tier → Apache HTTP Server (Presentation Layer)
 Application Tier → Apache Tomcat (Business Logic Layer)
 Database Tier → MySQL/MariaDB (Data Layer)
 ```
- 
+
+
+ The architecture follows AWS production best practices:
+
  
 ```bash
 Multi-AZ deployment
