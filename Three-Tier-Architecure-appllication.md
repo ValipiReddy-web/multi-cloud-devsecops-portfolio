@@ -43,3 +43,28 @@ DB AZ-A	                   Private Subnet	                   10.0.31.0/24
 DB AZ-B                   	Private Subnet	                   10.0.32.0/24
 
 ```
+
+# Security Group Architecture
+
+Bastion Host SG
+
+```bash
+Inbound:
+
+ SSH 22
+Source: My IP
+
+Outbound:
+
+All Traffic
+```
+Note : 
+Purpose:
+
+Secure administration access
+No direct SSH access to private servers
+
+
+
+
+
