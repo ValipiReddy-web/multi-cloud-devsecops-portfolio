@@ -10,8 +10,23 @@ Database Tier → MySQL/MariaDB (Data Layer)
 
 
  The architecture follows AWS production best practices:
+# 📊 High Availability Design
 
- 
+### Features:
+```bash
+✅ Multiple Availability Zones
+
+✅ Load Balancer based traffic distribution
+
+✅ Private Application Servers
+
+✅ Private Database Layer
+
+✅ Security Group isolation
+
+✅ Bastion based administration
+ ```
+
 ```bash
 Multi-AZ deployment
 ✅ Public and Private Subnet isolation
