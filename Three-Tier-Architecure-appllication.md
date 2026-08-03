@@ -10,6 +10,13 @@ Database Tier → MySQL/MariaDB (Data Layer)
 
 
  The architecture follows AWS production best practices:
+
+ ## 🏗️ Architecture Diagram
+
+<p align="center">
+  <img src="images/aws-3-tier-ha-architecure.png" 
+       alt=" AWS three Tier Architecture" 
+       width="900">
 # 📊 High Availability Design
 
 ### Features:
