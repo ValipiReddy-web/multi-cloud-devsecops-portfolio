@@ -22,13 +22,25 @@ pipeline {
      *******************************/
     parameters {
 
-        choice(
-            name: 'ACTION',
-            choices: ['DEPLOY', 'ROLLBACK'],
-            description: 'Select Deployment Action'
-        )
+    choice(
+        name: 'ACTION',
+        choices: ['DEPLOY', 'SWITCH', 'ROLLBACK'],
+        description: 'Deployment Action'
+    )
 
-    }
+    string(
+        name: 'IMAGE_TAG',
+        defaultValue: 'v1',
+        description: 'Enter Docker Image Tag (v1, v2, v3, release-1.0.0, etc.)'
+    )
+
+    string(
+        name: 'ACTIVE_VERSION',
+        defaultValue: 'v1',
+        description: 'Enter Active Version (v1, v2, v3)'
+    )
+
+}
 
     /*******************************
      * Environment Variables
@@ -136,11 +148,453 @@ pipeline {
                     -Dsonar.sources=src \
                     -Dsonar.java.binaries=target/classes
                     """
-```
-
                 }
 
             }
 
         }
- 
+
+
+ /**********************************************
+     * Stage 5 : Upload Artifact to Amazon S3
+     **********************************************/
+    stage('Upload Artifact to S3') {
+
+        steps {
+
+            echo "Uploading Java Artifact to S3..."
+
+            sh """
+            aws s3 cp target/*.jar \
+            s3://${S3_BUCKET}/
+            """
+
+        }
+    }
+
+
+    /**********************************************
+     * Stage 6 : Docker Build + Trivy Scan
+     *
+     * Build Docker image and scan security
+     * before pushing to ECR
+     **********************************************/
+    stage('Docker Build & Trivy Scan') {
+
+        steps {
+
+            script {
+
+                echo "Building Docker Image ${IMAGE_TAG}"
+
+                sh """
+                docker build \
+                -t ${IMAGE_NAME} .
+                """
+
+
+                echo "Running Trivy Security Scan"
+
+                sh """
+                trivy image \
+                --severity HIGH,CRITICAL \
+                --exit-code 1 \
+                --no-progress \
+                ${IMAGE_NAME}
+                """
+
+            }
+
+        }
+    }
+
+
+    /**********************************************
+     * Stage 7 : Login to AWS ECR
+     **********************************************/
+    stage('AWS ECR Login') {
+
+        steps {
+
+            echo "Authenticating with Amazon ECR"
+
+            sh """
+
+            aws ecr get-login-password \
+            --region ${AWS_REGION} | \
+            docker login \
+            --username AWS \
+            --password-stdin ${ECR_REGISTRY}
+
+            """
+
+        }
+    }
+
+
+    /**********************************************
+     * Stage 8 : Push Image to ECR
+     **********************************************/
+    stage('Push Docker Image') {
+
+        steps {
+
+            echo "Pushing Image ${IMAGE_TAG} to ECR"
+
+            sh """
+
+            docker push ${IMAGE_NAME}
+
+            """
+
+        }
+    }
+
+
+
+    /**********************************************
+     * Stage 9 : Blue-Green Deployment
+     *
+     * Example:
+     *
+     * Deploy v2 alongside v1
+     *
+     * image.tag=v2
+     * activeVersion=v1
+     *
+     **********************************************/
+    stage('Deploy Application') {
+
+
+        when {
+
+            expression {
+
+                params.ACTION == 'DEPLOY'
+
+            }
+
+        }
+
+
+        steps {
+
+
+            echo "Deploying New Version"
+
+
+            sh """
+
+            helm upgrade --install ${HELM_RELEASE} ${HELM_CHART} \
+            --namespace ${KUBE_NAMESPACE} \
+            --create-namespace \
+            -f ${HELM_CHART}/${HELM_VALUES} \
+            --set image.tag=${params.IMAGE_TAG} \
+            --set activeVersion=${params.ACTIVE_VERSION}
+
+            """
+
+        }
+
+    }
+
+
+
+
+    /**********************************************
+     * Stage 10 : Switch Traffic
+     *
+     * Example:
+     *
+     * Current Traffic
+     * v1
+     *
+     * Switch
+     * v2
+     *
+     **********************************************/
+    stage('Switch Traffic') {
+
+
+        when {
+
+            expression {
+
+                params.ACTION == 'SWITCH'
+
+            }
+
+        }
+
+
+        steps {
+
+
+            echo "Switching Traffic"
+
+
+            sh """
+
+            helm upgrade ${HELM_RELEASE} ${HELM_CHART} \
+            --namespace ${KUBE_NAMESPACE} \
+            -f ${HELM_CHART}/${HELM_VALUES} \
+            --set activeVersion=${params.ACTIVE_VERSION}
+
+            """
+
+        }
+
+    }
+
+
+
+    /**********************************************
+     * Stage 11 : Rollback Traffic
+     *
+     * Example:
+     *
+     * v3 problem
+     *
+     * Switch back to v2
+     *
+     **********************************************/
+    stage('Rollback') {
+
+
+        when {
+
+            expression {
+
+                params.ACTION == 'ROLLBACK'
+
+            }
+
+        }
+
+
+        steps {
+
+
+            echo "Rolling Back Application"
+
+
+            sh """
+
+            helm upgrade ${HELM_RELEASE} ${HELM_CHART} \
+            --namespace ${KUBE_NAMESPACE} \
+            -f ${HELM_CHART}/${HELM_VALUES} \
+            --set activeVersion=${params.ACTIVE_VERSION}
+
+            """
+
+        }
+
+    }
+
+
+
+
+    /**********************************************
+     * Stage 12 : Deployment Validation
+     **********************************************/
+    stage('Deployment Validation') {
+
+
+        steps {
+
+
+            echo "Validating Kubernetes Deployment"
+
+
+            sh """
+
+            echo "Checking Namespace"
+
+            kubectl get ns ${KUBE_NAMESPACE}
+
+
+
+            echo "Checking Pods"
+
+            kubectl get pods \
+            -n ${KUBE_NAMESPACE}
+
+
+
+            echo "Checking Services"
+
+            kubectl get svc \
+            -n ${KUBE_NAMESPACE}
+
+
+
+            echo "Checking Rollout Status"
+
+            kubectl rollout status \
+            deployment/${HELM_RELEASE} \
+            -n ${KUBE_NAMESPACE}
+
+            """
+
+        }
+
+    }
+
+
+ /**********************************************
+     * Post Actions
+     *
+     * Email notification after pipeline execution
+     **********************************************/
+    post {
+
+
+        /******************************************
+         * Pipeline Success Notification
+         ******************************************/
+        success {
+
+
+            echo "Pipeline Completed Successfully"
+
+
+            emailext(
+
+                subject: "SUCCESS: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+
+
+                body: """
+
+Hello Team,
+
+Jenkins pipeline completed successfully.
+
+Application Details
+===================
+
+Job Name       : ${JOB_NAME}
+
+Build Number   : ${BUILD_NUMBER}
+
+Build URL      : ${BUILD_URL}
+
+
+Deployment Details
+==================
+
+Environment    : PROD
+
+Namespace      : ${KUBE_NAMESPACE}
+
+Helm Release   : ${HELM_RELEASE}
+
+Action         : ${params.ACTION}
+
+Image Tag      : ${params.IMAGE_TAG}
+
+Active Version : ${params.ACTIVE_VERSION}
+
+Docker Image   : ${IMAGE_NAME}
+
+
+Status:
+
+Application deployment completed successfully.
+
+
+Regards,
+
+DevOps Team
+
+""",
+
+
+                to: "${EMAIL_TO}"
+
+            )
+
+        }
+
+
+
+        /******************************************
+         * Pipeline Failure Notification
+         ******************************************/
+        failure {
+
+
+            echo "Pipeline Failed"
+
+
+            emailext(
+
+                subject: "FAILED: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+
+
+                body: """
+
+Hello Team,
+
+Jenkins pipeline execution failed.
+
+
+Application Details
+===================
+
+Job Name      : ${JOB_NAME}
+
+Build Number  : ${BUILD_NUMBER}
+
+Build URL     : ${BUILD_URL}
+
+
+Deployment Details
+==================
+
+Environment   : PROD
+
+Namespace     : ${KUBE_NAMESPACE}
+
+Helm Release  : ${HELM_RELEASE}
+
+Action        : ${params.ACTION}
+
+Image Tag     : ${params.IMAGE_TAG}
+
+
+Status:
+
+Please check Jenkins console logs for failure details.
+
+
+Regards,
+
+DevOps Team
+
+""",
+
+
+                to: "${EMAIL_TO}"
+
+            )
+
+        }
+
+
+
+        /******************************************
+         * Pipeline Completion
+         ******************************************/
+        always {
+
+
+            echo "Pipeline Execution Completed"
+
+
+        }
+
+    }
+
+}
+
+```
