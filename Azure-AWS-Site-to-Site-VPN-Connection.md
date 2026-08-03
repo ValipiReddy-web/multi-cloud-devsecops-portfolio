@@ -52,6 +52,42 @@ BGP                 : Disabled (Static Routing Demo)
 Wait approximately 30–45 minutes for deployment. 
 
 
+##AWS Configuration
+
+5.Create VPC
+Name      : aws-vpc
+
+CIDR      : 10.10.0.0/16
+
+6.Create Public/Private Subnet
+Subnet Name
+
+private-subnet-01
+
+CIDR
+
+10.10.1.0/24
+
+7.Create Customer Gateway --> Create a customer gateway pointing to the Public IP Address of Azure VPN Gateway
+ IP address: Public IP Address of Azure VPN Gateway
+ Customer Gateway
+
+IP Address
+
+Azure VPN Gateway Public IP
+
+Routing
+
+Static
+
+8.Create Virtual Private Gateway --> Create the Virtual Private Gateway then attach to the VPC
+Name
+
+vgw-azure
+
+ASN
+
+Default  or 64512 you can use
 
 
 
