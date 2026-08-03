@@ -164,7 +164,7 @@ Scheme:
 Internet-facing
 Listener:
 
-HTTP: 80
+HTTP/HTTPS: 80/443
 
 Target Group:
 
@@ -207,10 +207,9 @@ app-tg
 
 Protocol:
 
-HTTP
+HTTP/ 
 
-Port:
-
+Ports:
 8080
 
 Health Check:
@@ -219,4 +218,42 @@ Path:
 /
 Matcher:
 200
+```
+
+SSL/TLS Configuration Using ACM  :
+AWS Certificate Manager (ACM)
+
+ 
+
+# 🌍 DNS Configuration (Route 53)
+
+Production traffic should not use ALB DNS directly.
+```bash
+Example:
+
+ALB DNS:
+
+my-alb-123456.ap-south-1.elb.amazonaws.com
+
+Instead use:
+
+https://www.example.com
+Route 53 Hosted Zone
+Create:
+
+saidevsecops.com
+
+Record:
+
+Type:
+
+A Record
+
+Alias:
+
+Yes
+
+Route traffic to:
+
+Application Load Balancer
 ```
