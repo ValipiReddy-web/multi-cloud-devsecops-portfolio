@@ -257,3 +257,11 @@ Route traffic to:
 
 Application Load Balancer
 ```
+
+🌐 Web Tier Configuration
+Apache Reverse Proxy Configuration
+
+Application Tier Setup -->bussines logic code running
+
+ 
+🗄️ Database Tier
