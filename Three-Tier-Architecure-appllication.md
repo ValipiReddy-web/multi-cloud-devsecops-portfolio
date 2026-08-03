@@ -82,7 +82,7 @@ HTTP 80
 Destination: Web SG
 ```
 Web Server Security Group
-
+```bash
 Inbound:
 
 HTTP 80
@@ -94,7 +94,7 @@ Source: Bastion SG
 Outbound:
 HTTP 80
 Destination: Internal ALB SG
-
+```
 Internal ALB Security Group
 ```bash
 Inbound:
