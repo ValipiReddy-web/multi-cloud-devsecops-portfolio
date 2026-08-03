@@ -79,7 +79,7 @@ pipeline {
         AWS_ACCOUNT_ID = "123456789012"
 
         // Amazon ECR
-        ECR_REPOSITORY = "java-app"
+        ECR_REPOSITORY = "contido"
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_TAG = "${BUILD_NUMBER}"
         IMAGE_NAME = "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
@@ -88,11 +88,11 @@ pipeline {
         S3_BUCKET = "prod-java-artifacts"
 
         // Kubernetes
-        KUBE_NAMESPACE = "prod"
+        NAMESPACE = "prod"
 
         // Helm
-        HELM_RELEASE = "java-app"
-        HELM_CHART = "./helm"
+        HELM_RELEASE = "contido-app"
+        HELM_CHART = "./contido-helm"
 
         // SonarQube
         SONAR_HOME = tool('sonar-scanner')
@@ -114,7 +114,7 @@ pipeline {
                 echo "Cloning Application Repository..."
 
                 git branch: 'main',
-                url: 'https://github.com/your-org/java-app.git'
+                url: 'https://github.com/your-org/contido.git'
 
             }
 
