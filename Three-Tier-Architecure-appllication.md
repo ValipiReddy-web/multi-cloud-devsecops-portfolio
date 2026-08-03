@@ -65,6 +65,75 @@ Secure administration access
 No direct SSH access to private servers
 
 
+Public ALB Security Group : 
 
+```bash
+ Inbound:
+
+HTTP 80
+Source: 0.0.0.0/0
+
+HTTPS 443
+Source: 0.0.0.0/0
+
+Outbound:
+
+HTTP 80
+Destination: Web SG
+```
+Web Server Security Group
+
+Inbound:
+
+HTTP 80
+Source: Public ALB SG
+
+SSH 22
+Source: Bastion SG
+
+Outbound:
+HTTP 80
+Destination: Internal ALB SG
+
+Internal ALB Security Group
+```bash
+Inbound:
+
+HTTP 80
+Source: Web SG
+
+Outbound:
+
+8080
+Destination: App SG
+```
+Application Server Security Group
+```bash
+Inbound:
+
+Tomcat 8080
+Source: Internal ALB SG
+
+SSH 22
+Source: Bastion SG
+
+Outbound:
+
+MySQL 3306
+Destination: DB SG
+```
+Database Security Group
+```bash
+Inbound:
+
+MYSQL 3306
+Source: App SG
+
+Optional:
+
+SSH 22
+Source: Bastion SG
+
+```
 
 
