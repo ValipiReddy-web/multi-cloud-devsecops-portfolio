@@ -8,11 +8,17 @@ GitHub
  
 1. Checkout Source Code
   
-2. GitLeaks Secret Scan
+2. GitLeaks Secret Scan -->Security Scan -->Passwords,Tokens ,Secrets 
    
 3. Build + Unit Test (Maven)
    
-4. SonarQube Code Analysis
+4. SonarQube Code Analysis -->
+Purpose
+Checks
+Bugs
+Code Smells
+Vulnerabilities
+Duplicated Code
    
 5. Upload JAR to AWS S3
    
