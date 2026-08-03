@@ -174,7 +174,7 @@ Destination          Target
 15. Create VMs in both Azure and AWS and Test the connection.
 
 16. Security
-``bash
+```bash
 Azure NSG
 
 Allow
@@ -186,9 +186,9 @@ SSH (22)
 RDP (3389)
 
 Application Ports
-```
+
 AWS Security Group
-```bash
+
 Allow
 
 ICMP
