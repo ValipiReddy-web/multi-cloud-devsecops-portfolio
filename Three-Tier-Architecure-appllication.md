@@ -24,6 +24,8 @@ Database Tier → MySQL/MariaDB (Data Layer)
 
 ✅ Security Group isolation
 
+Route 53 + ACM HTTPS flow
+
 ✅ Bastion based administration
  ```
 
@@ -264,4 +266,4 @@ Apache Reverse Proxy Configuration
 Application Tier Setup -->bussines logic code running
 
  
-🗄️ Database Tier
+🗄️ Database Tier  --> Store  Application Data
