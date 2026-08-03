@@ -13,8 +13,10 @@ Database Tier → MySQL/MariaDB (Data Layer)
 
  ## 🏗️ Architecture Diagram
 
+<h2 align="center">🏗️ AWS Three Tier High Availability Architecture</h2>
+
 <p align="center">
-  <img src="images/aws-3-tier-ha-architecure.png" 
+  <img src="images/aws-3-tier-ha-architecture.png" 
        alt="AWS Three Tier High Availability Architecture" 
        width="900">
 </p>
