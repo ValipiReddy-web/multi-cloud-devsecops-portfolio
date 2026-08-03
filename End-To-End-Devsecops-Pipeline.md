@@ -289,6 +289,8 @@ pipeline {
      * image.tag=v2
      * activeVersion=v1
      *
+
+     Note : New pods will deployed ,Traffci is routed through v1 only
      **********************************************/
     stage('Deploy Application') {
 
@@ -338,7 +340,7 @@ pipeline {
      *
      * Switch
      * v2
-     *
+     * Note : Switch the traffic new version of deployment v2 application
      **********************************************/
     stage('Switch Traffic') {
 
@@ -383,7 +385,7 @@ pipeline {
      * v3 problem
      *
      * Switch back to v2
-     *
+     *Note : Rollback application not working properly old version
      **********************************************/
     stage('Rollback') {
 
