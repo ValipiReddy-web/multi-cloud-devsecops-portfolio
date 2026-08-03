@@ -6,8 +6,10 @@ project demonstrates a highly available and secure 3-Tier Web Application Archit
 Web Tier → Apache HTTP Server (Presentation Layer)
 Application Tier → Apache Tomcat (Business Logic Layer)
 Database Tier → MySQL/MariaDB (Data Layer)
+```
  
-The architecture follows AWS production best practices:
+ 
+```bash
 Multi-AZ deployment
 ✅ Public and Private Subnet isolation
 ✅ Application Load Balancer
