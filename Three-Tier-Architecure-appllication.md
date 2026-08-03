@@ -187,6 +187,7 @@ Path: /
 Matcher:
 
 200
+```
 
 Internal ALB
 
@@ -215,9 +216,7 @@ Port:
 Health Check:
 
 Path:
-
 /
-
 Matcher:
 200
 ```
