@@ -1,8 +1,8 @@
-#End-To-End-DevSecOps-Pipeline 
+# End-To-End-DevSecOps-Pipeline 
 
-###production-ready Jenkinsfile
+## production-ready Jenkinsfile
 
-###Stage Explanation
+### Stage Explanation
 
 pipeline {
 
