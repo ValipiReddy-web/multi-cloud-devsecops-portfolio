@@ -2,6 +2,33 @@
 
  ##  production-ready Jenkins file from scratch
 
+ # Production Pipeline
+ ```bash
+GitHub
+ 
+1. Checkout Source Code
+  
+2. GitLeaks Secret Scan
+   
+3. Build + Unit Test (Maven)
+   
+4. SonarQube Code Analysis
+   
+5. Upload JAR to AWS S3
+   
+6. Docker Build + Trivy Image Scan
+   
+7. Push Image to AWS ECR
+    
+8. Helm Deployment (prod namespace)
+    
+9. Deployment Validation
+    
+10. Rollout / Rollback
+ 
+11. Email Notification
+```
+
  ## Stage Explanation 
 
  ```bash
